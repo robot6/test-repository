@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html lang="en"><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Moving Image via Canvas</title>
+	<style type="text/css" media="screen">
+		body { background:#eee; margin:2em; }
+		#bg { position:absolute; top:1em; bottom:1em; left:1em; right:1em }
+		canvas { position:absolute; top:1em; left:1em; background:#fff; border:1px solid #ccc; z-index:-1; }
+	</style>
+</head><body>
+<h1>Moving Image via Canvas</h1>
+<p>Testing basic browser performance for <a href="http://stackoverflow.com/questions/4842872/web-page-image-move-performance-comparison-style-change-vs-html5-canvas">this Stack Overflow question</a>. Only the area around the image itself is cleared and re-drawn each frame.</p>
+<p id="fps">??? fps</p>
+<div id="bg"></div>
+<canvas></canvas>
+<script type="text/javascript" charset="utf-8">
+	var canvas = document.getElementsByTagName('canvas')[0];
+	var bg     = document.getElementById('bg');
+	var ctx    = canvas.getContext('2d');
+	window.onresize = function(){
+		canvas.width  = bg.offsetWidth;
+		canvas.height = bg.offsetHeight;
+	};
+	window.onresize();
+	var img = new Image;
+	img.onload = function(){
+		var fps = document.getElementById('fps');
+		var w = img.width, h = img.height;
+		var avgDelay = 0, x=100, y=100;
+		var lastDraw = new Date;
+		var jiggle = function(){
+			ctx.clearRect(x-1,y-1,w+2,h+2);
+			x += Math.random()*6-3;
+			y += Math.random()*6-3;
+			ctx.drawImage(img,x,y);
+			var now = new Date;
+			var delay = now - lastDraw;
+			avgDelay += (delay - avgDelay) / 10;
+			lastDraw = now;
+			setTimeout(jiggle,0);
+		};
+		jiggle();
+		setInterval(function(){
+			fps.innerHTML = (1000/avgDelay).toFixed(1) + " fps";
+		},2000);
+	};
+	img.src = "http://phrogz.net/tmp/gkhead.jpg";
+</script>
+</body></html>
